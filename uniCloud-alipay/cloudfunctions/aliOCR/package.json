@@ -1,0 +1,9 @@
+{
+  "name": "aliOCR",
+  "dependencies": {
+    "openai": "^4.93.0"
+  },
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

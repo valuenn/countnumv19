@@ -130,16 +130,16 @@
 			base:"",
 			contentTxt:'',
 			accessToken:"",
-			selectedType:"手写中文1",
+			selectedType:"手写中文",
 			ocrTypes: [
 				{
-					name: "手写中文1",
+					name: "手写中文",
 				},
 				{
-					name: "手写中文2",
+					name: "印刷体中英文",
 				},
 				{
-					name: "印刷文字｜手写英文",
+					name: "手写英文",
 				}
 				],
 			
@@ -197,7 +197,8 @@
 						} else {
 
 							if (type == "hand") {
-								this.xunfeiHandwriting()
+								this.baiduHandwritingOnly()
+								
 							} else if (type == "general") {
 								this.baiduBasic()
 							} else if (type == "handEng") {
@@ -208,7 +209,8 @@
 					fail:(err) => {
 
 						if (type == "hand") {
-							this.xunfeiHandwriting()
+							this.baiduHandwritingOnly()
+							
 						} else if (type == "general") {
 							this.baiduBasic()
 						} else if (type == "handEng") {
@@ -220,7 +222,54 @@
 			},	
 							
 			
-
+			aliOCR(type){
+				if (this.base !== ""){
+				uniCloud.callFunction({
+					name:"aliOCR",
+					data:{
+						imageBase64:this.base,
+						type:type
+					},
+					success:(res) => {
+						// console.log(res)
+						// if (res.errCode == 0) {
+						if (res.result && res.result.choices.length > 0){
+							let finalString = res.result.choices[0].message.content
+							this.saveToHistory(finalString)
+						} else {
+							if (type == "hand") {
+								this.baiduHandwritingOnly()
+							} else if (type == "general") {
+								this.baiduBasic()
+							} else if (type == "handEng") {
+								this.baiduHandwritingOnly()
+							} else {
+								this.baiduHandwriting()
+							}
+						}
+					},
+					fail:(err) => {
+						console.log(err)
+						if (type == "hand") {
+							this.baiduHandwritingOnly()
+						} else if (type == "general") {
+							this.baiduBasic()
+						} else if (type == "handEng") {
+							this.baiduHandwritingOnly()
+						} else {
+							//accurate
+							this.baiduHandwriting()
+						}
+					}
+				})
+				} else {
+					this.loading = false
+					uni.showModal({
+						title:"图片有问题哈,",
+						content:`请重新选图，确保图片中的文字水平排列，倾斜、侧放、倒放的图片文字无法识别哈，图片尺寸过长过大也无法识别哈，请重新选图片或联系我们哈。${err.errMsg}`
+					})
+				}
+			},	
 			
 			
 					
@@ -343,31 +392,54 @@
 						this.saveToHistory(finalString)
 						
 						} else {
-							this.loading = false
-							if (res.data.error_code == 216202) {
-								uni.showModal({
-									title: "抱歉有问题哈",
-									content: res.data.error_msg + " 图片大小有问题哈，图片最短边至少15px，最长边最大4096px哈"
-								})
+							this.aliOCR()
+
+						}
+					},
+					fail:(err)=> {
+						this.aliOCR()
+
+					}
+				})					
+			},
+		async baiduHandwriting(){
+				let t = await this.getToken()
+				uni.request({
+					url:` https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic?access_token=${t}`,
+					data:{
+						image:this.base,
+						detect_direction: true
+					 },
+					method:"POST",
+					header:{'content-type':'application/x-www-form-urlencoded'},
+					success:(res)=>{
+						if (res.data.words_result) {
+							
+						let raw = res.data.words_result
+						let finalString = ""
+						for (let i in raw) {
+							finalString = finalString + raw[i].words + "  "
+						}
+						this.saveToHistory(finalString)
+						
+						} else {
+							if (res.data.error_code == 6) {
+								//did not turn on the accurate api, use the handwriting api
+								// console.log('turn on handwriting')
+								this.baiduHandwritingOnly()
+								
 							} else {
-								uni.showModal({
-									title: "抱歉有问题哈",
-									content: res.data.error_msg
-								})
+							this.aliOCR()
+
 							}
 						}
 					},
 					fail:(err)=> {
-						this.loading = false
-						uni.showModal({
-							title: "抱歉识别有问题哈",
-							content: err.errMsg
-						})	
-						return
+						this.aliOCR()
+	
 					}
-				})					
-			},
-			
+				})		
+		},	
 		
 		async baiduHandwritingOnly(){
 				let t = await getToken(apiKeyBaidu, secretKeyBaidu)
@@ -391,28 +463,12 @@
 						
 						} else {
 
-							this.loading = false
-							if (res.data.error_code == 216202) {
-								uni.showModal({
-									title: "抱歉有问题哈",
-									content: res.data.error_msg + " 图片大小有问题哈，图片最短边至少15px，最长边最大4096px哈"
-								})
-							} else {
-								
-							uni.showModal({
-								title: "抱歉有问题哈",
-								content: res.data.error_msg
-							})
-							}
+							this.aliOCR()
 							
 						}
 					},
 					fail:(err)=> {						
-						this.loading = false
-						uni.showModal({
-							title: "抱歉识别有问题哈",
-							content: err.errMsg + "请稍后再试或联系我们~"
-						})	
+						this.aliOCR()
 					}
 				})		
 		},
@@ -453,17 +509,17 @@
 				 
 				 if (this.image !== '' && this.base !== '') {
 
-						if (this.selectedType === "手写中文1") {
+						if (this.selectedType === "手写中文") {
 								this.tulingOCR("hand")
 								
-							} else if (this.selectedType === "手写中文2") {
-								this.xunfeiHandwriting()
+							} else if (this.selectedType === "印刷体中英文") {
+								this.tulingOCR("general")
 							} 
 							
-							else if (this.selectedType == "印刷文字｜手写英文") {
-								this.xunfeiPrintNeat("general")
+							else if (this.selectedType == "手写英文") {
+								this.tulingOCR("handEng")
 						} else {
-							this.xunfeiPrintNeat("handEng")
+							this.tulingOCR("handEng")
 						}
 
 				} else {
