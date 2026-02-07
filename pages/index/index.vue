@@ -219,120 +219,9 @@
 				})
 			},	
 							
-			// 组装业务参数handwriting
-			async getXParamStr(){
-			  const CryptoJS = await import('crypto-js')
-			  let xParam = {
-			    language: 'cn|en'
-			  }
-			  return CryptoJS.default.enc.Base64.stringify(CryptoJS.default.enc.Utf8.parse(JSON.stringify(xParam)))
-			},
 			
-						
-			async xunfeiHandwriting() {
-				let ts = Math.round(new Date().getTime()/1000)
-				let xParamStr = await this.getXParamStr()
-				const CryptoJS = await import('crypto-js')
-				let xCheckSum = CryptoJS.default.MD5(apiKeyOCRXF + ts + xParamStr).toString()
-				
-				uni.request({
-					url:"https://webapi.xfyun.cn/v1/service/v1/ocr/handwriting",
-					method:"POST",
-					timeout:360000,
-					header:{
-						'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
-						'X-Appid': appIdOCRXF,
-						'X-CurTime': ts,
-						'X-Param': xParamStr,
-						'X-CheckSum': xCheckSum
-					},
-					data:{
-						image:this.base
-					},
-					success:(res) => {
-						// console.log(res)
-						if (res.data.code == "0") {
-							let blocks = res.data.data.block
-							let finalString = ""
-							for (let block in blocks ) {
-								let lines = blocks[block].line
-								for (let l in lines) {
-									let wordline = lines[l].word
 
-									let aLine = ""
-									for (let word in wordline) {
-										aLine = aLine + wordline[word].content
-									}
-									finalString = finalString +  aLine + "  " 
-									
-								}
-							}
-							this.saveToHistory(finalString)
-
-						} 
-						
-						else {
-							 this.baiduHandwritingOnly()
-							
-						} 
-					},
-					fail:(err) => {
-						this.baiduHandwritingOnly()
-					}
-				})
-			},
 			
-			
-			async xunfeiPrintNeat(type) {
-				let ts = Math.round(new Date().getTime()/1000)
-				let xParamStr = await this.getXParamStr()
-				const CryptoJS = await import('crypto-js')
-				let xCheckSum = CryptoJS.default.MD5(apiKeyOCRXF + ts + xParamStr).toString()
-				uni.request({
-					url:"https://webapi.xfyun.cn/v1/service/v1/ocr/general",
-					method:"POST",
-					timeout:360000,
-					header:{
-						'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
-						'X-Appid': appIdOCRXF,
-						'X-CurTime': ts,
-						'X-Param': xParamStr,
-						'X-CheckSum': xCheckSum
-					},
-					data:{
-						image:this.base
-					},
-					success:(res) => {
-						// console.log(res)
-						if (res.data.code == "0") {
-							let blocks = res.data.data.block
-							let finalString = ""
-							for (let block in blocks ) {
-								let lines = blocks[block].line
-								for (let l in lines) {
-									let wordline = lines[l].word
-
-									let aLine = ""
-									for (let word in wordline) {
-										aLine = aLine + wordline[word].content + ' '
-									}
-									finalString = finalString +  aLine + "  "
-
-								}
-							}
-							this.saveToHistory(finalString)
-
-						}
-
-						 else {
-							 this.tulingOCR(type)
-						}
-					},
-					fail:(err) => {
-						this.tulingOCR(type)	
-					}
-				})
-			},
 			
 					
 			
@@ -391,16 +280,16 @@
 					uni.getFileSystemManager().saveFile({
 							tempFilePath: filePath,
 							filePath:realPath,
-							success: async (res) => {
-								// console.log(res)
+							success: (res) => {
+								console.log(res)
 								if (res && res.savedFilePath) {
 									this.image = res.savedFilePath
 									var bitmap =uni.getFileSystemManager().readFile({
 										filePath:res.savedFilePath,
 										encoding:'base64',
-										success: async (encodeRes) => {
-											const CryptoJS = await import('crypto-js')
-											this.base = encodeRes.data.toString(CryptoJS.default.enc.Utf8)
+										success: (encodeRes) => {
+											console.log(encodeRes)
+											this.base = encodeRes.data
 											this.loadingImg = false
 
 										},
