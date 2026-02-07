@@ -105,7 +105,6 @@
 	const apiKeyBaidu = process.uniEnv.apiKey;
 	const secretKeyBaidu = process.uniEnv.secretKey;
 
-	import PageAdManager from '@/common/pageAdManager.js'
 	import { countText,getToken } from '@/utils/textCounter.js'
 
 	export default {
@@ -143,63 +142,11 @@
 					name: "印刷文字｜手写英文",
 				}
 				],
-			pageAdManager: null,
-			_adShowTimer: null,
-			_adLoadTimer: null
 			
         	}
 		},
 		
-		//   onLoad() {
-		// 	this._adLoadTimer = setTimeout(() => {
-		// 		try {
-		// 			this.pageAdManager = new PageAdManager()
-		// 			this.pageAdManager.init('adunit-a3bb23f85e43ae1a')
-		// 			// 首次加载初始化完成后，尝试展示广告
-		// 			if (!this._adShowTimer) {
-		// 				this._adShowTimer = setTimeout(() => {
-		// 					if (this.pageAdManager && !this.pageAdManager.isShowing) {
-		// 						this.pageAdManager.show()
-		// 					}
-		// 					this._adShowTimer = null
-		// 				}, 3000)
-		// 			}
-		// 		} catch (error) {
-		// 			console.warn('首页广告管理器初始化失败，不影响正常使用:', error)
-		// 			this.pageAdManager = null
-		// 		}
-		// 	}, 2000)
-		// },
 		
-		// onShow() {
-		// 	if (this.pageAdManager && !this._adShowTimer) {
-		// 		this._adShowTimer = setTimeout(() => {
-		// 			if (this.pageAdManager && !this.pageAdManager.isShowing) {
-		// 				this.pageAdManager.show()
-		// 			}
-		// 			this._adShowTimer = null
-		// 		}, 3000)
-		// 	}
-		// },
-		
-		// onHide() {
-		// 	if (this._adShowTimer) {
-		// 		clearTimeout(this._adShowTimer)
-		// 		this._adShowTimer = null
-		// 	}
-		// },
-		
-
-		// onUnload() {
-		// 	if (this._adLoadTimer) {
-		// 		clearTimeout(this._adLoadTimer)
-		// 		this._adLoadTimer = null
-		// 	}
-		// 	if (this.pageAdManager) {
-		// 		this.pageAdManager.destroy()
-		// 		this.pageAdManager = null
-		// 	}
-		// },
 
 		methods: {
 			

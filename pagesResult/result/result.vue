@@ -148,9 +148,6 @@
 				<button class="myButton ai-btn" @click="checkAI">
 						AI率检测
 				 </button>	
-<!-- 				 <button class="myButton ai-btn" @click="toSpell">
-				 		错字检测
-				  </button> -->
 			</view>
 			</view>
 		<view>
@@ -165,7 +162,6 @@
 </template>
 
 <script>
-	import PageAdManager from '@/common/pageAdManager.js'
 	import { countText } from '@/utils/textCounter.js'
 
 export default {
@@ -199,25 +195,12 @@ export default {
 				showEditPopup: false,
 				showAggregatePopup: false,
 				showAddCountPopup: false,
-				hasError: false,
 				scrollTop: 0,
-				pageAdManager: null,
-				_adShowTimer: null
 			}
 		},
 	
 		
 		 onLoad(options) {
-			// 延迟1秒初始化广告，不影响页面加载
-			setTimeout(() => {
-				try {
-					this.pageAdManager = new PageAdManager()
-					this.pageAdManager.init('adunit-66d462ba14d1134e')
-				} catch (error) {
-					// 静默失败，不影响用户体验
-					this.pageAdManager = null
-				}
-			}, 1000)
 
 			try {
 				if (options.ch && options.en && options.num && options.pun) {
@@ -244,39 +227,7 @@ export default {
 			}
 		},
 
-		onShow() {
-			// 页面显示时展示广告，给用户充分时间查看结果
-			if (this.pageAdManager && !this._adShowTimer) {
-				this._adShowTimer = setTimeout(() => {
-					if (this.pageAdManager && !this.pageAdManager.isShowing) {
-						this.pageAdManager.show().catch(() => {
-							// 广告展示失败不影响用户体验
-						})
-					}
-					this._adShowTimer = null
-				}, 3000)  // 延长到5秒，给用户充分时间
-			}
-		},
 
-		onHide() {
-			console.log('onhide')
-			if (this._adShowTimer) {
-				clearTimeout(this._adShowTimer)
-				this._adShowTimer = null
-			}
-		},
-		
-		onUnload() {
-			// 页面卸载时销毁广告实例
-			if (this._adShowTimer) {
-				clearTimeout(this._adShowTimer)
-				this._adShowTimer = null
-			}
-			if (this.pageAdManager) {
-				this.pageAdManager.destroy()
-				this.pageAdManager = null
-			}
-		},
 	
 		methods: {
 			toSpell(){
@@ -316,8 +267,7 @@ export default {
 		},
 	
 			
-			async addNumbers() {
-			// await this.pageAdManager.show()
+			 addNumbers() {
 
 				const REGEX = {
 				  NUMBER: /\d+(?:\.\d+)?/g,  
@@ -339,8 +289,7 @@ export default {
 				}
 			},
 			
-			   async aggregateCount(){
-				  // await this.pageAdManager.show()
+			    aggregateCount(){
 
 					const REGEX = {
 					  CHINESE: /[\u4e00-\u9fa5]/g,
@@ -409,7 +358,6 @@ export default {
 				            10: '#FFEBEE'  // 出现10次及以上 - 浅红色
 				        };
 				        
-				        // 如果次数超过10，使用最高次数的颜色
 				        if (count > 10) {
 				            return colorMap[10];
 				        }
@@ -444,8 +392,7 @@ export default {
 			},
 
 	
-			async editText(){
-				// await this.pageAdManager.show()
+			editText(){
 
 				this.closeAllPopups()
 				this.showEditPopup = true
@@ -520,8 +467,7 @@ export default {
 		},
 
 
-			async copy() {
-		// await this.pageAdManager.show()
+			copy() {
 
 				uni.setClipboardData({
 					data: this.totalString,

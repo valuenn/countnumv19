@@ -42,79 +42,25 @@
 </template>
 
 <script>
-	import PageAdManager from '@/common/pageAdManager.js'
 	import { countText } from '@/utils/textCounter.js'
 
 export default {
 
   data() {
     return {
-	  pageAdManager: null,
       allHistory: [],
       visibleHistory: [],
       currentPage: 1,
       pageSize: 10,
       hasMore: true,
       loading: false,
-      pageAdManager: null,
-	  _adShowTimer: null,
-	  _adLoadTimer: null
     }
   },
   onLoad() {
     this.loadHistory()
-	this._adLoadTimer = setTimeout(() => {
-		try {
-			this.pageAdManager = new PageAdManager()
-			this.pageAdManager.init('adunit-ec791e73f4069ace')
-			// 首次加载初始化完成后，尝试展示广告
-			if (!this._adShowTimer) {
-				this._adShowTimer = setTimeout(() => {
-					if (this.pageAdManager && !this.pageAdManager.isShowing) {
-						this.pageAdManager.show()
-					}
-					this._adShowTimer = null
-				}, 3000)
-			}
-		} catch (error) {
-			// console.warn('结果页广告管理器初始化失败，不影响正常使用:', error)
-			this.pageAdManager = null
-		}
-	}, 2000)
+
   },
   
- //  onUnload() {
-	// if (this._adLoadTimer) {
-	// 	clearTimeout(this._adLoadTimer)
-	// 	this._adLoadTimer = null
-	// }
-	// if (this.pageAdManager) {
-	// 	this.pageAdManager.destroy()
-	// 	this.pageAdManager = null
-	// }
- //  },
-  
-  onHide() {
-  	if (this._adShowTimer) {
-  		clearTimeout(this._adShowTimer)
-  		this._adShowTimer = null
-  	}
-  },
-  
-  onUnload() {
-  	if (this._adLoadTimer) {
-  		clearTimeout(this._adLoadTimer)
-  		this._adLoadTimer = null
-  	}
-  	if (this._adShowTimer) {
-  		clearTimeout(this._adShowTimer)
-  		this._adShowTimer = null
-  	}
-  	if (this.pageAdManager) {
-  		this.pageAdManager.destroy()
-  		this.pageAdManager = null
-  	}
-  },
 
 
   
@@ -132,7 +78,6 @@ export default {
     },
 
     async loadMore() {
-	// await this.pageAdManager.show()
 
       if (!this.hasMore || this.loading) return
       
@@ -146,7 +91,6 @@ export default {
     },
 
    async deleteItem(id) {
-				// await this.pageAdManager.show()
 
       uni.showModal({
         title: '确认删除',
@@ -162,7 +106,6 @@ export default {
     },
 
    async deleteAll() {
-				// await this.pageAdManager.show()
 
       uni.showModal({
         title: '确认清空',
@@ -179,7 +122,6 @@ export default {
     },
 
     async viewDetail(txt) {
-				// await this.pageAdManager.show()
 
 		const result = countText(txt)
 		let punctuationNum = result.punctuationNum
