@@ -330,14 +330,12 @@
 							tempFilePath: filePath,
 							filePath:realPath,
 							success: (res) => {
-								console.log(res)
 								if (res && res.savedFilePath) {
 									this.image = res.savedFilePath
 									var bitmap =uni.getFileSystemManager().readFile({
 										filePath:res.savedFilePath,
 										encoding:'base64',
 										success: (encodeRes) => {
-											console.log(encodeRes)
 											this.base = encodeRes.data
 											this.loadingImg = false
 
@@ -403,7 +401,7 @@
 				})					
 			},
 		async baiduHandwriting(){
-				let t = await this.getToken()
+				let t = await getToken(apiKeyBaidu, secretKeyBaidu)
 				uni.request({
 					url:` https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic?access_token=${t}`,
 					data:{
@@ -510,14 +508,18 @@
 				 if (this.image !== '' && this.base !== '') {
 
 						if (this.selectedType === "手写中文") {
-								this.tulingOCR("hand")
+								this.tulingOCR()
+								// this.baiduBasic()
+								// this.aliOCR()
 								
 							} else if (this.selectedType === "印刷体中英文") {
-								this.tulingOCR("general")
+								// this.tulingOCR("general")
+								this.baiduHandwriting()
 							} 
 							
 							else if (this.selectedType == "手写英文") {
-								this.tulingOCR("handEng")
+								// this.tulingOCR("handEng")
+								this.baiduHandwritingOnly()
 						} else {
 							this.tulingOCR("handEng")
 						}

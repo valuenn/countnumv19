@@ -585,6 +585,7 @@ export default {
     /* 兼容不同iOS版本的安全区域设置 */
     padding-bottom: constant(safe-area-inset-bottom);
     padding-bottom: env(safe-area-inset-bottom);
+	
   }
   
   .popup-header {
@@ -610,11 +611,14 @@ export default {
     flex: 1;
     overflow-y: auto;
     padding-bottom: 0;
+	overflow: hidden;
+	
   }
   
   .popup-content-wrapper {
     margin-right: 30rpx;
     margin-left: 30rpx;
+	
   }
   
   .popup-bottom-fixed {
@@ -648,6 +652,8 @@ export default {
     height: 35vh;
     padding: 30rpx;
     width: 100%;
+	padding-bottom: 216rpx !important;
+	
   }
   
   .popup-confirm-btn {
@@ -662,6 +668,8 @@ export default {
     background-color: #F8F7F8;
     padding: 30rpx;
     margin-top: 20rpx;
+	padding-bottom: 126rpx !important;
+	
   }
   
   .frequency-group {
